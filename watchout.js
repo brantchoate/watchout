@@ -1,9 +1,7 @@
 // currently have to iterate through array to find different asteroids
 var asteroids = [
   {id: 0, cx: 0, cy: 0, r: 30},
-  {id: 1, cx: 10, cy: 10, r: 30},
-  {id: 2, cx: 20, cy: 20, r: 30},
-  {id: 3, cx: 30, cy: 30, r: 30}
+  {id: 1, cx: 10, cy: 10, r: 30}
 ];
 
 var playerData = [
@@ -66,7 +64,7 @@ var moveAsteroids = function(data) {
   d3.selectAll('.asteroid')
     .data(data)
       .transition()
-      .duration(750)
+        .duration(750)
         .attr('cx',function(a){
           return a.cx;
         })
@@ -74,11 +72,8 @@ var moveAsteroids = function(data) {
           return a.cy;
         })
         .tween('custom', function (a) {
-          var i = d3.interpolateRound(0,100);
           return function(t) {
-            checkCollision(a, function() {
-
-            });
+            checkCollision(a, onCollision);
             var nextX = randomPositionGenerator() * t;
             var nextY = randomPositionGenerator() * t;
             a.cx = nextX;
@@ -86,10 +81,6 @@ var moveAsteroids = function(data) {
           }
         });
 };
-
-setInterval(function(){
-  moveAsteroids(asteroids);
-}, 1500);
 
 //make the player draggable
 var drag = d3.behavior.drag()
@@ -114,4 +105,25 @@ var checkCollision = function (asteroid, onCollision) {
   }
 };
 
+var onCollision = function () {
+  score = 0;
+  console.log('poop');
+  currentScore = d3.select('.current span')
+                   .data([score])
+                   .text(function(s) { return s;});
+};
+
 //keep track of score
+var score = 0;
+ // on every move we want to return the first collision that happend
+
+var currentScore = 0;
+
+// start game
+setInterval(function(){
+  score += 1000;
+  currentScore = d3.select('.current span')
+                   .data([score])
+                   .text(function(s) { return s;});
+  moveAsteroids(asteroids);
+}, 1500);
