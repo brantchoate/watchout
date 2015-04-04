@@ -1,5 +1,15 @@
 /* your beautiful css styling goes here! */
+svg {
+  background-color: black;
+}
 
+.asteroid {
+  fill: #ff69b4;
+}
+
+.player {
+  fill: #fff;
+}
 /* Note: an asteroid image is included in this repo.
 Feel free to use it if you like. */
 
