@@ -65,26 +65,30 @@ var moveAsteroids = function(data) {
 
   d3.selectAll('.asteroid')
     .data(data)
-
       .transition()
-        .duration(750)
-        .tween('custom', function (a) {
-          console.log(a);
-          return checkCollision(a, function() {
-            console.log("you suck.");
-          });
+      .duration(750)
+        .attr('cx',function(a){
+          return a.cx;
         })
-      .attr('cx',function(a){
-        return randomPositionGenerator();
-      })
-      .attr('cy',function(a){
-        return randomPositionGenerator();
-      });
+        .attr('cy',function(a){
+          return a.cy;
+        })
+        .tween('custom', function (a) {
+          var i = d3.interpolateRound(0,100);
+          return function(t) {
+            checkCollision(a, function() {
+
+            });
+            var nextX = randomPositionGenerator() * t;
+            var nextY = randomPositionGenerator() * t;
+            a.cx = nextX;
+            a.cy = nextY;
+          }
+        });
 };
 
 setInterval(function(){
   moveAsteroids(asteroids);
-  d3.selectAll('.asteroid');
 }, 1500);
 
 //make the player draggable
@@ -103,7 +107,6 @@ var checkCollision = function (asteroid, onCollision) {
   var diffY = asteroid.cy - parseInt(player.attr('cy'));
   // use pythag to calculate the diagonal between the player and asteroid
   var distance = Math.sqrt( Math.pow(diffX,2) + Math.pow(diffY,2));
-  console.log(diffX);
 
   if (distance < radiiSum) {
 
