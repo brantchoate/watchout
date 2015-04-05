@@ -1,11 +1,28 @@
-// currently have to iterate through array to find different asteroids
+var currentScore = 0;
+var highScore = 0;
+var collisions = 0;
+
+var updateScore = function () {
+  d3.select('.high span').text(highScore);
+  d3.select('.current span').text(currentScore);
+  d3.select('.collisions span').text(collisions);
+};
+
+var tick = function () {
+  currentScore += 1000;
+  highScore = currentScore;
+  updateScore();
+};
+
 var asteroids = [
   {id: 0, cx: 0, cy: 0, r: 30},
-  {id: 1, cx: 10, cy: 10, r: 30}
+  {id: 1, cx: 10, cy: 10, r: 30},
+  {id: 2, cx: 15, cy: 10, r: 30},
+  {id: 3, cx: 20, cy: 10, r: 30}
 ];
 
 var playerData = [
-  {id: "player", cx: 250, cy: 250, r: 20}
+  {id: "player", cx: 250, cy: 250, r: 30}
 ];
 // build our game board
 var gameBoard = d3.select('body')
@@ -79,8 +96,12 @@ var moveAsteroids = function(data) {
             a.cx = nextX;
             a.cy = nextY;
           }
+        }).each('end', function() {
+          moveAsteroids(data);
         });
 };
+
+moveAsteroids(asteroids);
 
 //make the player draggable
 var drag = d3.behavior.drag()
@@ -93,6 +114,7 @@ var drag = d3.behavior.drag()
 var checkCollision = function (asteroid, onCollision) {
   // sum up the radii and calculate the distance between the
     // x and the y of the player and the asteroid
+  var collision = false;
   var radiiSum = asteroid.r + parseInt(player.attr('r'));
   var diffX = asteroid.cx - parseInt(player.attr('cx'));
   var diffY = asteroid.cy - parseInt(player.attr('cy'));
@@ -100,30 +122,24 @@ var checkCollision = function (asteroid, onCollision) {
   var distance = Math.sqrt( Math.pow(diffX,2) + Math.pow(diffY,2));
 
   if (distance < radiiSum) {
-
+    collision = true;
     onCollision(player, asteroid);
   }
+
+  if(collision) {
+    score = 0;
+
+    if( prevCollision != collision){
+      collisions = collisions + 1;
+    }
+  }
+
+  prevCollision = collision;
 };
 
 var onCollision = function () {
-  score = 0;
-  console.log('poop');
-  currentScore = d3.select('.current span')
-                   .data([score])
-                   .text(function(s) { return s;});
+  currentScore = -1000;
+  console.log('hit');
 };
 
-//keep track of score
-var score = 0;
- // on every move we want to return the first collision that happend
-
-var currentScore = 0;
-
-// start game
-setInterval(function(){
-  score += 1000;
-  currentScore = d3.select('.current span')
-                   .data([score])
-                   .text(function(s) { return s;});
-  moveAsteroids(asteroids);
-}, 1500);
+setInterval(tick, 1000);
